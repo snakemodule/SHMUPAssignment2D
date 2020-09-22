@@ -5,50 +5,56 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class HomingMissile : MonoBehaviour
 {
-    //private Transform targetLock;
     public Transform TargetLock { private get; set; }
+    public PooledObject LockOnIcon { private get; set; }
 
     private Rigidbody2D body = null;
+    public Rigidbody2D Body { get => body; private set => body = value; }
 
-    [SerializeField] private float speed; // make common projectile class?
-
-    [SerializeField] private float unlockedLifetime = 5;
+    [SerializeField] private int damage = 5;
+    [SerializeField] private float missileThrustForce = 0.5f; // make common projectile class?
+    [SerializeField] private float lingerLifetime = 5f;
+    [SerializeField] private float chaseDelay = 0.5f;
 
     private PooledObject pooled = null;
-
-    private Coroutine chasing = null;
 
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
         pooled = GetComponent<PooledObject>();
     }
-
-    private void OnEnable()
-    {
-        //if (chasing != null)
-        //{
-        //    StopCoroutine(chasing);
-        //}
-        //chasing = StartCoroutine(ChaseTargetLock());
-    }
+    
 
     public IEnumerator ChaseTargetLock()    
     {
-                
-        
+        yield return new WaitForSeconds(chaseDelay);
         while (TargetLock.gameObject.activeSelf)
         {
             Debug.DrawLine(transform.position, TargetLock.position - transform.position);
-            transform.rotation = Quaternion.LookRotation(
-                TargetLock.position - transform.position,
-                Vector3.forward);
+            transform.rotation = Quaternion.LookRotation(                
+                Vector3.back, TargetLock.position - transform.position);
 
-            body.AddForce(transform.TransformDirection(transform.up), ForceMode2D.Force);
+            body.AddForce(transform.up*missileThrustForce, ForceMode2D.Force);
             yield return null;
         }
-        //yield return new WaitForSeconds(unlockedLifetime);
-        //pooled.returnToPool(); //todo death function
+        LockOnIcon.returnToPool();
+        var saveDrag = body.drag;
+        body.drag = 0f;
+        yield return new WaitForSeconds(lingerLifetime);
+        body.drag = saveDrag;
+        DestroyMissile(); 
     }
-    
+
+    private void DestroyMissile()
+    {        
+        pooled.returnToPool();
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        collision.GetComponent<Enemy>().Damage(damage);
+        LockOnIcon.returnToPool();
+        DestroyMissile();
+    }
+
 }

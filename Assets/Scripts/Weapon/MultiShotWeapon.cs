@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MultiShot : BulletWeapon
+public class MultiShotWeapon : BulletWeapon
 {
 
-    public int BulletsFired = 3;
+    //public int BulletsFired = 3;
 
-    [Range(1, 128)] public int count;
-    [Range(0f, 90f)] public float spreadAngleDeg;
+    [Range(1, 128)] public int bulletsFired = 3;
+    [Range(0f, 90f)] public float spreadAngleDeg = 45f;
 
     private void Awake()
     {
@@ -16,16 +16,18 @@ public class MultiShot : BulletWeapon
         shootCallback = Shoot;
     }
 
+    public override string Name => "Multi Shot";
+
     protected override void Shoot()
     {
         float angSpread = spreadAngleDeg * Mathf.Deg2Rad;
 
         // angle between each bullet
-        float angBetweenBullets = count == 1 ? 0 : angSpread / (count - 1f);
+        float angBetweenBullets = bulletsFired == 1 ? 0 : angSpread / (bulletsFired - 1f);
 
         // offset to center bullets
-        float angOffset = count == 1 ? 0 : angSpread / 2f;
-        for (int i = 0; i < count; i++)
+        float angOffset = bulletsFired == 1 ? 0 : angSpread / 2f;
+        for (int i = 0; i < bulletsFired; i++)
         {
             // angle for this bullet
             float angle = angBetweenBullets * i - angOffset;

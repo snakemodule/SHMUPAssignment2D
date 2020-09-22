@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class BulletWeapon : ContinousFireWeapon
+public class BulletWeapon : ContinuousFireWeapon
 {
     public PooledObject Bullet;
     
@@ -10,11 +10,15 @@ public class BulletWeapon : ContinousFireWeapon
         
     protected SimplePool bulletPool;
 
+    public override string Name => "Standard";
+
     private void Awake()
     {
         bulletPool = new SimplePool(10, Bullet);
         shootCallback = Shoot;
     }
+
+    
 
     protected override void Shoot()
     {

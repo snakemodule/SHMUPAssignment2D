@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 public class Cursor : MonoBehaviour
 {
     private InputManager m_inputManager;    
-    private Camera m_mainCamera;
+    private Camera m_mainCamera = null;
 
     private Transform thisTransform;
 
@@ -15,14 +15,18 @@ public class Cursor : MonoBehaviour
     private void Awake()
     {
         thisTransform = transform;
+        m_mainCamera = Camera.main;
+    }
+    
+    private void OnEnable()
+    {
+        m_inputManager = InputManager.Instance;        
+        m_inputManager.MousePositionRegister(updateCursorPosition);
     }
 
-    // Start is called before the first frame update
-    private void Start()
+    private void OnDisable()
     {
-        m_inputManager = InputManager.Instance;
-        m_mainCamera = MainManager.Instance.MainCamera;
-        m_inputManager.MousePositionRegister(updateCursorPosition);
+        m_inputManager.MousePositionUnregister(updateCursorPosition);
     }
 
     private void Update()

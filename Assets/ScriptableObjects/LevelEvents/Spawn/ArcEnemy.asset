@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 684b32195dbba334b84a6af46741a73f, type: 3}
-  m_Name: SpawnOmegaPathDefaultEnemy
+  m_Name: ArcEnemy
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 3858450992866070337, guid: 4470789893ddd644eb1ce7e61e82ca3c, type: 3}
-  enemyPath: {fileID: 11400000, guid: 5726dc668dd6b7b4aaa818d798db7381, type: 2}
+  enemyPath: {fileID: 11400000, guid: 3d7472df515203040ba44d640707d392, type: 2}

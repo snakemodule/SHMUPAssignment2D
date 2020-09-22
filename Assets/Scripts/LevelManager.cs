@@ -91,15 +91,17 @@ public class LevelManager : MonoBehaviour
     //}
 
     public void SpawnEnemy(PooledObject prefab, PathNodes enemyPath)
-    {
-        Action<PooledObject> initializer = (PooledObject instance) =>
-            { instance.GetComponent<Enemy>().movementPath = enemyPath; };
-
+    {        
         if (!PooledLevelObjects.ContainsKey(prefab))
-            PooledLevelObjects[prefab] = new SimplePool(20, prefab, initializer); //todo magic number
-        PooledObject newEnemy = PooledLevelObjects[prefab].getFromPool();
+        {
+            //Action<PooledObject> initializer = (PooledObject instance) =>
+            //{ instance.GetComponent<Enemy>().movementPath = enemyPath; };
+            PooledLevelObjects[prefab] = new SimplePool(20, prefab); //todo magic number
+        }
+        PooledObject spawnEnemy = PooledLevelObjects[prefab].getFromPool();
+        spawnEnemy.GetComponent<Enemy>().movementPath = enemyPath;
 
-        var enemyScript = newEnemy.GetComponent<Enemy>();
+        var enemyScript = spawnEnemy.GetComponent<Enemy>();
         enemyScript.DeactivateCallback = (Enemy enemy) => { };
         //UpdateEnemyPosition(enemyScript, 0);
 

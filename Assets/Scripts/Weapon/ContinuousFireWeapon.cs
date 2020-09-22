@@ -7,13 +7,15 @@ using UnityEngine;
 /// is called. To use this, derived classes should set the shootCallback in
 /// their Awake methods.
 /// </summary>
-public abstract class ContinousFireWeapon : MonoBehaviour, IWeapon
+public abstract class ContinuousFireWeapon : MonoBehaviour, IWeapon
 {
-    public float ShotsPerSecond = 2;
+    public float ShotsPerSecond = 5;
     protected Action shootCallback;
 
     private IEnumerator firing = null;
     private float lastShotTime = 0;
+
+    public abstract string Name { get; }
 
     public void PullTrigger()
     {
@@ -45,6 +47,6 @@ public abstract class ContinousFireWeapon : MonoBehaviour, IWeapon
         }
     }
 
-    protected abstract void Shoot();
+    protected abstract void Shoot();    
 }
 

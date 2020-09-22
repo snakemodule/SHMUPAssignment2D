@@ -1,36 +1,39 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer))]
 
-public class LaserWeapon : ContinousFireWeapon
+public class LaserWeapon : ContinuousFireWeapon
 {
+    [SerializeField] private int DamagePerPulse = 3;
     [SerializeField] private float BeamLength = 12f;
     [SerializeField] private float maxBeamWidth = 0.35f;
     [SerializeField] private float minBeamWidth = 0.2f;
+    [SerializeField] private Material beamMaterial = null;
+    [SerializeField] private Color beamColor = Color.white;
 
-    [SerializeField] private List<int> HitsLayers = new List<int> { 9 };    
 
     private LineRenderer lineRenderer;
     private IEnumerator beamAnimation;
-    private int hitDetectLayerMask;
+
+    public override string Name => "Pulse Laser";
 
     private void Awake()
     {
         shootCallback = Shoot;
         lineRenderer = gameObject.GetComponent<LineRenderer>();
         lineRenderer.widthMultiplier = 0f;
-        hitDetectLayerMask = 0;
-        HitsLayers.ForEach((layerNumber) => { hitDetectLayerMask = hitDetectLayerMask | (1 << layerNumber); }); //test this
     }
 
     private void OnEnable()
     {
         lineRenderer.SetPositions(new Vector3[]
             { Vector3.zero, new Vector3(0f, BeamLength, 0f) });
-        lineRenderer.widthMultiplier = 0f;        
+        lineRenderer.widthMultiplier = 0f;
+
+        lineRenderer.material = beamMaterial;
+        lineRenderer.startColor = beamColor;
+        lineRenderer.endColor = beamColor;
     }
 
     private void OnDisable()
@@ -46,13 +49,13 @@ public class LaserWeapon : ContinousFireWeapon
             StopCoroutine(beamAnimation);
         beamAnimation = AnimateBeam(delay);
         StartCoroutine(beamAnimation);
-        
 
-        Ray laserRay = new Ray(transform.position, Vector3.up);
-        RaycastHit hit;
-        if (Physics.Raycast(laserRay, out hit, BeamLength, hitDetectLayerMask))
+
+        int enemiesLayerMask = 1 << LayerMask.NameToLayer("Enemies");
+        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, Vector2.up, BeamLength, enemiesLayerMask);
+        foreach (var item in hits)
         {
-            //todo deal damage
+            item.transform.GetComponent<Enemy>().Damage(DamagePerPulse);
         }
     }
 
@@ -68,4 +71,26 @@ public class LaserWeapon : ContinousFireWeapon
         }
         lineRenderer.widthMultiplier = 0f;
     }
+
+    public void Init(int damage, float fireRate, float beamLength, 
+        float maxWidth, float minWidth, Material beamMaterial, Color beamColor)
+    {
+        ShotsPerSecond = fireRate;
+        DamagePerPulse = damage;
+        BeamLength = beamLength;
+        maxBeamWidth = maxWidth;
+        minBeamWidth = minWidth;
+
+        lineRenderer.SetPositions(new Vector3[]
+            { Vector3.zero, new Vector3(0f, BeamLength, 0f) });
+        lineRenderer.useWorldSpace = false;
+        lineRenderer.material = beamMaterial;
+        lineRenderer.startColor = beamColor;
+        lineRenderer.endColor = beamColor;
+
+        this.beamMaterial = beamMaterial;
+        this.beamColor = beamColor;
+    }
+
+
 }
