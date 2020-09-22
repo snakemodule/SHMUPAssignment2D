@@ -9,27 +9,32 @@ using UnityEngine;
 /// </summary>
 public abstract class ContinuousFireWeapon : MonoBehaviour, IWeapon
 {
-    public float ShotsPerSecond = 5;
-    protected Action shootCallback;
+    #region //inspector
+    [SerializeField] protected float ShotsPerSecond = 5;
+    #endregion
 
-    private IEnumerator firing = null;
-    private float lastShotTime = 0;
+
+    #region //internal
+    private IEnumerator m_firing = null;
+    private float m_lastShotTime = 0;
+    protected Action m_shootCallback;
+    #endregion
 
     public abstract string Name { get; }
 
     public void PullTrigger()
     {
-        if (firing != null)
+        if (m_firing != null)
         {
-            StopCoroutine(firing);
+            StopCoroutine(m_firing);
         }
-        firing = ContinuousFire(shootCallback);
-        StartCoroutine(firing);
+        m_firing = ContinuousFire(m_shootCallback);
+        StartCoroutine(m_firing);
     }
 
     public void ReleaseTrigger()
     {
-        StopCoroutine(firing);
+        StopCoroutine(m_firing);
     }
 
     private IEnumerator ContinuousFire(Action shoot)
@@ -38,15 +43,15 @@ public abstract class ContinuousFireWeapon : MonoBehaviour, IWeapon
         while (isActiveAndEnabled)//todo is this correct?
         {
             yield return null;
-            float t = Time.time - lastShotTime;
-            if (Time.time - lastShotTime >= shotDelay)
+            float t = Time.time - m_lastShotTime;
+            if (Time.time - m_lastShotTime >= shotDelay)
             {
-                lastShotTime = Time.time;
-                shootCallback();
+                m_lastShotTime = Time.time;
+                m_shootCallback();
             }
         }
     }
 
-    protected abstract void Shoot();    
+    protected abstract void Shoot();
 }
 

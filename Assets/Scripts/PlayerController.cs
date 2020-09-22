@@ -5,33 +5,30 @@ using UnityEngine.InputSystem;
 //[RequireComponent(typeof(BulletWeapon))]
 public class PlayerController : MonoBehaviour
 {
-    //set in inspector
-    #region
-    [SerializeField] private Transform m_followTarget = null;
-    [SerializeField] private float m_followSpeed = 5.0f;
-    [SerializeField] private Ship ship = null;
+
+    #region //inspector
+    [SerializeField] private Transform FollowTarget = null;
+    [SerializeField] private float FollowSpeed = 5.0f;
+    [SerializeField] private Ship PlayerShip = null;
+    #endregion
+
+    #region //internal
+    private List<IWeapon> m_weapons = new List<IWeapon>();
+    private int m_weaponsIterator = 0;
+    private InputManager m_inputManager;
+    private Mouse m_mouseDevice = null;
+    private bool m_LMBPressed = false;
     #endregion
 
 
-
-    private List<IWeapon> weapons = new List<IWeapon>();
-    private int weaponsIterator = 0;
-
-    private InputManager m_inputManager;
-
-    Mouse mouseDevice = null;
-    bool LMBPressed = false;
-
     private void Awake()
     {
-        weapons.Add(GetComponent<MultiShotWeapon>());
-        //weapons.Add(GetComponent<LaserWeapon>());
-        //weapons.Add(GetComponent<HomingMissileWeapon>());
+        m_weapons.Add(GetComponent<MultiShotWeapon>());        
     }
 
     private void OnEnable()
     {
-        mouseDevice = InputSystem.GetDevice<Mouse>();
+        m_mouseDevice = InputSystem.GetDevice<Mouse>();
         m_inputManager = InputManager.Instance;
         m_inputManager.LMBRegister(FirePressed, FireReleased);
         m_inputManager.RMBRegister(ShieldPressed);
@@ -46,42 +43,42 @@ public class PlayerController : MonoBehaviour
 
     private void FirePressed(InputAction.CallbackContext context)
     {
-        LMBPressed = true;
-        weapons[weaponsIterator].PullTrigger();
+        m_LMBPressed = true;
+        m_weapons[m_weaponsIterator].PullTrigger();
     }
 
     private void FireReleased(InputAction.CallbackContext context)
     {
-        LMBPressed = false;
-        weapons[weaponsIterator].ReleaseTrigger();
+        m_LMBPressed = false;
+        m_weapons[m_weaponsIterator].ReleaseTrigger();
     }
 
     private void ShieldPressed(InputAction.CallbackContext context)
     {
-        ship.ActivateShield();
+        PlayerShip.ActivateShield();
     }
 
     private void Update()
     {
         transform.position = Vector3.MoveTowards(transform.position,
-            m_followTarget.position, m_followSpeed * Time.deltaTime);
+            FollowTarget.position, FollowSpeed * Time.deltaTime);
 
-        if (!LMBPressed && weapons.Count > 1)
+        if (!m_LMBPressed && m_weapons.Count > 1)
         {
-            float scrollValue = mouseDevice.scroll.y.ReadValue();
-            (weapons[weaponsIterator] as MonoBehaviour).enabled = false;
+            float scrollValue = m_mouseDevice.scroll.y.ReadValue();
+            (m_weapons[m_weaponsIterator] as MonoBehaviour).enabled = false;
             if (scrollValue > 0)
             {
                 
-                if (++weaponsIterator > weapons.Count - 1)
-                    weaponsIterator = 0;
+                if (++m_weaponsIterator > m_weapons.Count - 1)
+                    m_weaponsIterator = 0;
             }
             else if (scrollValue < 0)
             {
-                if (--weaponsIterator < 0)
-                    weaponsIterator = weapons.Count - 1;
+                if (--m_weaponsIterator < 0)
+                    m_weaponsIterator = m_weapons.Count - 1;
             }
-            (weapons[weaponsIterator] as MonoBehaviour).enabled = true;
+            (m_weapons[m_weaponsIterator] as MonoBehaviour).enabled = true;
         }
 
     }
@@ -89,9 +86,7 @@ public class PlayerController : MonoBehaviour
     public T AddWeapon<T>() where T : UnityEngine.Component, IWeapon
     {
         T newWeaponComponent = gameObject.AddComponent<T>();
-        weapons.Add(newWeaponComponent);
-        //set weapons iterator
-
+        m_weapons.Add(newWeaponComponent);
         return newWeaponComponent;
     }
 

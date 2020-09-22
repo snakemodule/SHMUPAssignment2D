@@ -1,54 +1,49 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 public class LevelManager : MonoBehaviour
 {
-    Dictionary<PooledObject, SimplePool> PooledLevelObjects =
-        new Dictionary<PooledObject, SimplePool>();
-
-    //List<Enemy> activeEnemies = new List<Enemy>();
-    //List<Enemy> toDeactivate = new List<Enemy>();
-
-    [Serializable]
-    public class TimelineEvent
+    #region //inspector, exposed for editor script
+    [Serializable] public class TimelineEvent
     {
         public ScriptableObject Event = null;
         public float eventTime = 0;
         public int repeatAdditionalTimes = 0;
         public float repeatDelay = 0;
     }
+    [SerializeField] public List<TimelineEvent> Timeline;
+    #endregion
 
-    public List<TimelineEvent> timeline;
-
-    private float levelStartTime;
-    private int timelineIterator;
+    #region //internal
+    private readonly Dictionary<PooledObject, SimplePool> m_pooledLevelObjects =
+        new Dictionary<PooledObject, SimplePool>(); 
+    private float m_levelStartTime;
+    private int m_timelineIterator;
+    #endregion
 
     private void Start()
     {
-        levelStartTime = Time.time;
+        m_levelStartTime = Time.time;
     }
 
     private void Update()
     {
-        float levelTime = Time.time - levelStartTime;
-        while (timelineIterator < timeline.Count
-            && levelTime >= timeline[timelineIterator].eventTime)
+        float levelTime = Time.time - m_levelStartTime;
+        while (m_timelineIterator < Timeline.Count
+            && levelTime >= Timeline[m_timelineIterator].eventTime)
         {
-            TimelineEvent timelineEntry = timeline[timelineIterator];
+            TimelineEvent timelineEntry = Timeline[m_timelineIterator];
             ILevelEvent levelEvent = (timelineEntry.Event as ILevelEvent);
             levelEvent.DoEvent(this);
             if (timelineEntry.repeatAdditionalTimes > 0)
             {
-                StartCoroutine(repeatEvent(levelEvent, timelineEntry.repeatAdditionalTimes,
+                StartCoroutine(RepeatEvent(levelEvent, timelineEntry.repeatAdditionalTimes,
                     timelineEntry.repeatDelay));
             }
-            timelineIterator++;
+            m_timelineIterator++;
         }
 
         //for (int i = activeEnemies.Count - 1; i > 0; i--)
@@ -72,7 +67,7 @@ public class LevelManager : MonoBehaviour
         //}
     }
 
-    private IEnumerator repeatEvent(ILevelEvent ev, int repeats, float delay)
+    private IEnumerator RepeatEvent(ILevelEvent ev, int repeats, float delay)
     {
         Assert.IsTrue(repeats > 0);
         while (repeats > 0)
@@ -81,45 +76,25 @@ public class LevelManager : MonoBehaviour
             ev.DoEvent(this);
             repeats--;
         }
-    }
-
-    //private void UpdateEnemyPosition(Enemy enemy, float time)
-    //{
-    //    enemy.transform.position = new Vector2(
-    //            enemy.movementPath.curveX.Evaluate(Time.time - enemy.SpawnTime),
-    //            enemy.movementPath.curveY.Evaluate(Time.time - enemy.SpawnTime));
-    //}
+    }    
 
     public void SpawnEnemy(PooledObject prefab, PathNodes enemyPath)
     {        
-        if (!PooledLevelObjects.ContainsKey(prefab))
-        {
-            //Action<PooledObject> initializer = (PooledObject instance) =>
-            //{ instance.GetComponent<Enemy>().movementPath = enemyPath; };
-            PooledLevelObjects[prefab] = new SimplePool(20, prefab); //todo magic number
+        if (!m_pooledLevelObjects.ContainsKey(prefab))
+        {            
+            m_pooledLevelObjects[prefab] = new SimplePool(20, prefab);
         }
-        PooledObject spawnEnemy = PooledLevelObjects[prefab].getFromPool();
-        spawnEnemy.GetComponent<Enemy>().movementPath = enemyPath;
-
-        var enemyScript = spawnEnemy.GetComponent<Enemy>();
-        enemyScript.DeactivateCallback = (Enemy enemy) => { };
-        //UpdateEnemyPosition(enemyScript, 0);
-
-        //activeEnemies.Add(enemyScript);
-    }
-
-    public void DeactivateEnemy(Enemy enemy)
-    {
-        //toDeactivate.Add(enemy);
+        PooledObject spawnEnemy = m_pooledLevelObjects[prefab].GetFromPool();
+        spawnEnemy.GetComponent<Enemy>().MovementPath = enemyPath;
     }
 
     private void OnValidate()
     {
-        for (int i = 0; i < timeline.Count; i++)
+        for (int i = 0; i < Timeline.Count; i++)
         {
-            if (timeline[i].Event != null && !(timeline[i].Event is ILevelEvent))
+            if (Timeline[i].Event != null && !(Timeline[i].Event is ILevelEvent))
             {
-                timeline[i] = null;
+                Timeline[i] = null;
                 Debug.LogWarning("ScriptableObject in timeline must a level event (i.e. inherit from ILevelEvent)");
             }
         }

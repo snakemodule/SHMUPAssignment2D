@@ -3,13 +3,10 @@ using UnityEngine;
 
 public class PooledObject : MonoBehaviour
 {
-    //this object belongs to this pool
     public SimplePool myPool;
 
-    //return to the pool and become inactive
-    public void returnToPool()
+    public void ReturnToPool()
     {
-        //gameObject.SetActive(false);
-        myPool.addToPool(this);
+        myPool.AddToPool(this);
     }
 }

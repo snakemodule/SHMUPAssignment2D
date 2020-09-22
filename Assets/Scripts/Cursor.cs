@@ -1,53 +1,50 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
+﻿using UnityEngine;
 
 public class Cursor : MonoBehaviour
 {
-    private InputManager m_inputManager;    
+
+    #region //Awake
     private Camera m_mainCamera = null;
+    private Transform m_transform;
+    #endregion
 
-    private Transform thisTransform;
+    #region //Enable
+    private InputManager m_inputManager;
+    #endregion
 
-    Vector2 mousePosition;
+    #region //internal
+    private Vector2 m_mousePosition;
+    #endregion
 
     private void Awake()
     {
-        thisTransform = transform;
+        m_transform = transform;
         m_mainCamera = Camera.main;
     }
     
     private void OnEnable()
     {
         m_inputManager = InputManager.Instance;        
-        m_inputManager.MousePositionRegister(updateCursorPosition);
+        m_inputManager.MousePositionRegister(UpdateCursorPosition);
     }
 
     private void OnDisable()
     {
-        m_inputManager.MousePositionUnregister(updateCursorPosition);
+        m_inputManager.MousePositionUnregister(UpdateCursorPosition);
     }
 
     private void Update()
     {        
-        if (Application.isFocused && mousePosition.x > 0 && mousePosition.x < Screen.width
-            && mousePosition.y > 0 && mousePosition.y < Screen.height)
+        if (Application.isFocused && m_mousePosition.x > 0 && m_mousePosition.x < Screen.width
+            && m_mousePosition.y > 0 && m_mousePosition.y < Screen.height)
         {
-            thisTransform.position = m_mainCamera.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, 1f));
+            m_transform.position = m_mainCamera.ScreenToWorldPoint(new Vector3(m_mousePosition.x, m_mousePosition.y, 1f));
         }
     }
 
-
-    private void updateCursorPosition(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    private void UpdateCursorPosition(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        mousePosition = context.ReadValue<Vector2>();
-        //if (Application.isFocused && position.x > 0 && position.x < Screen.width
-        //    && position.y > 0 && position.y < Screen.height)
-        //{
-        //    thisTransform.position = m_mainCamera.ScreenToWorldPoint(new Vector3(position.x, position.y, 1f));
-        //}
-        //
+        m_mousePosition = context.ReadValue<Vector2>();        
     }
 
 

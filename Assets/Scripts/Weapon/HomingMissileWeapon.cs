@@ -5,153 +5,155 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class HomingMissileWeapon : MonoBehaviour, IWeapon
 {
-    [SerializeField] private PooledObject missilePrefab = null;
-    [SerializeField] private PooledObject lockOnIcon = null;
-    [SerializeField] private float lockOnDistance = 15f;
-    [SerializeField] private float launchImpulse = 0.5f;
-    [SerializeField] private Material beamMaterial = null;
-    [SerializeField] private Color beamColor = Color.white;
+    #region //inspector
+    [SerializeField] private PooledObject MissilePrefab = null;
+    [SerializeField] private PooledObject LockOnIconPrefab = null;
+    [SerializeField] private float LockOnDistance = 15f;
+    [SerializeField] private float LaunchImpulse = 0.5f;
+    [SerializeField] private Material BeamMaterial = null;
+    [SerializeField] private Color BeamColor = Color.white;
+    #endregion
+
+    #region //internal
     private enum EWeaponState
     {
         neutral,
         locking,
         firing
     }
-    private EWeaponState weaponState = EWeaponState.neutral;
+    private EWeaponState m_weaponState = EWeaponState.neutral;
+    private HashSet<Transform> m_lockOns = new HashSet<Transform>();
+    private Dictionary<Transform, LockOnIcon> m_lockOnIcons =
+            new Dictionary<Transform, LockOnIcon>();
+    private Coroutine m_lockingCoroutine;
+    private SimplePool m_missilePool = null;
+    private SimplePool m_lockOnIconPool = null;
+    #endregion
 
-    
-    private HashSet<Transform> lockOns =
-        new HashSet<Transform>();
-    private Dictionary<Transform, LockOnIcon> lockOnIcons = 
-        new Dictionary<Transform, LockOnIcon>();
-
-    private LineRenderer lineRenderer = null;
-
-    private Coroutine lockingCoroutine;
-
-    private SimplePool missilePool = null;
-    private SimplePool lockOnIconPool = null;
+    #region //Awake
+    private LineRenderer m_lineRenderer = null;
+    #endregion
 
     public string Name => "Homing Missiles";
 
     private void Awake()
     {
-        lineRenderer = GetComponent<LineRenderer>();
-        lineRenderer.widthMultiplier = 0f;
+        m_lineRenderer = GetComponent<LineRenderer>();
+        m_lineRenderer.widthMultiplier = 0f;
 
-        if (missilePrefab != null)
+        if (MissilePrefab != null)
         {
-            missilePool = new SimplePool(10, missilePrefab);
+            m_missilePool = new SimplePool(10, MissilePrefab);
         }
     }
 
     private void OnEnable()
     {
-        lineRenderer.SetPositions(new Vector3[]
+        m_lineRenderer.SetPositions(new Vector3[]
             { Vector3.zero, new Vector3(0f, 15f, 0f) });
-        lineRenderer.widthMultiplier = 0f;
+        m_lineRenderer.widthMultiplier = 0f;
 
-        lineRenderer.material = beamMaterial;
-        lineRenderer.startColor = beamColor;
-        lineRenderer.endColor = beamColor;
+        m_lineRenderer.material = BeamMaterial;
+        m_lineRenderer.startColor = BeamColor;
+        m_lineRenderer.endColor = BeamColor;
     }
 
     private void OnDisable()
     {
-        lineRenderer.widthMultiplier = 0f;
+        m_lineRenderer.widthMultiplier = 0f;
     }
 
     public void PullTrigger()
     {
-        if (weaponState == EWeaponState.neutral)
+        if (m_weaponState == EWeaponState.neutral)
         {
-            weaponState = EWeaponState.locking;
-            lineRenderer.widthMultiplier = 0.15f;
-            lockingCoroutine = StartCoroutine(locking());
+            m_weaponState = EWeaponState.locking;
+            m_lineRenderer.widthMultiplier = 0.15f;
+            m_lockingCoroutine = StartCoroutine(Locking());
         }
     }
 
     public void ReleaseTrigger()
     {
-        if (weaponState == EWeaponState.locking)
+        if (m_weaponState == EWeaponState.locking)
         {
-            weaponState = EWeaponState.firing;
-            lineRenderer.widthMultiplier = 0.0f;
-            if (lockingCoroutine != null)
-                StopCoroutine(lockingCoroutine);
-            StartCoroutine(firing());
+            m_weaponState = EWeaponState.firing;
+            m_lineRenderer.widthMultiplier = 0.0f;
+            if (m_lockingCoroutine != null)
+                StopCoroutine(m_lockingCoroutine);
+            StartCoroutine(Firing());
         }
     }
 
-    private IEnumerator locking()
+    private IEnumerator Locking()
     {
         RaycastHit2D[] hits;
         LayerMask layer = 1 << LayerMask.NameToLayer("Enemies");
-        while (weaponState == EWeaponState.locking)
+        while (m_weaponState == EWeaponState.locking)
         {
-            hits = Physics2D.RaycastAll(transform.position, Vector2.up, lockOnDistance, layer);
+            hits = Physics2D.RaycastAll(transform.position, Vector2.up, LockOnDistance, layer);
             foreach (var item in hits)
             {
-                if (!lockOns.Contains(item.transform))
+                if (!m_lockOns.Contains(item.transform))
                 {
-                    lockOns.Add(item.transform);
-                    var icon = lockOnIconPool.getFromPool().GetComponent<LockOnIcon>();
-                    icon.followTarget = item.transform;
-                    lockOnIcons.Add(item.transform, icon);
+                    m_lockOns.Add(item.transform);
+                    var icon = m_lockOnIconPool.GetFromPool().GetComponent<LockOnIcon>();
+                    icon.FollowTarget = item.transform;
+                    m_lockOnIcons.Add(item.transform, icon);
                 }
             }
             yield return null;
         }
     }
 
-    private IEnumerator firing()
+    private IEnumerator Firing()
     {
         float fireDelay = 0.15f; //todo field
-        foreach (Transform target in lockOns)
-        {            
-            var homingMissile = missilePool.getFromPool().GetComponent<HomingMissile>();
+        foreach (Transform target in m_lockOns)
+        {
+            var homingMissile = m_missilePool.GetFromPool().GetComponent<HomingMissile>();
             homingMissile.TargetLock = target;
-            lockOnIcons[target].missileLaunched = true ;
-            lockOnIcons[target].missile = homingMissile;
+            m_lockOnIcons[target].MissileLaunched = true;
+            m_lockOnIcons[target].Missile = homingMissile;
 
             Vector2 randomSpawnDirection = Random.insideUnitCircle.normalized;
             randomSpawnDirection = new Vector2(randomSpawnDirection.x, Mathf.Abs(randomSpawnDirection.y));
-            homingMissile.transform.position = transform.position+(Vector3)randomSpawnDirection * 0.5f;
+            homingMissile.transform.position = transform.position + (Vector3)randomSpawnDirection * 0.5f;
 
-            homingMissile.Body.AddForce(randomSpawnDirection*launchImpulse, ForceMode2D.Impulse);
+            homingMissile.Body.AddForce(randomSpawnDirection * LaunchImpulse, ForceMode2D.Impulse);
 
             homingMissile.transform.rotation = Quaternion.LookRotation(
                 Vector3.back, target.position - homingMissile.transform.position);
             homingMissile.StartChase();
-            
+
             yield return new WaitForSeconds(fireDelay);
         }
-        lockOns.Clear();
-        lockOnIcons.Clear();
-        weaponState = EWeaponState.neutral;
+        m_lockOns.Clear();
+        m_lockOnIcons.Clear();
+        m_weaponState = EWeaponState.neutral;
     }
 
-    public void Init(PooledObject prefab, float lockOnDistance, float launchImpulse, 
+    public void Init(PooledObject prefab, float lockOnDistance, float launchImpulse,
         Material beamMaterial, Color beamColor, PooledObject lockOnIcon)
     {
-        missilePrefab = prefab;
-        missilePool = new SimplePool(10, missilePrefab);
-        this.lockOnIcon = lockOnIcon;
-        lockOnIconPool = new SimplePool(10, lockOnIcon);
+        MissilePrefab = prefab;
+        m_missilePool = new SimplePool(10, MissilePrefab);
+        this.LockOnIconPrefab = lockOnIcon;
+        m_lockOnIconPool = new SimplePool(10, this.LockOnIconPrefab);
 
-        this.lockOnDistance = lockOnDistance;
-        this.launchImpulse = launchImpulse;
+        this.LockOnDistance = lockOnDistance;
+        this.LaunchImpulse = launchImpulse;
 
-        lineRenderer.SetPositions(new Vector3[]
+        m_lineRenderer.SetPositions(new Vector3[]
             { Vector3.zero, new Vector3(0f, 15f, 0f) });
-        lineRenderer.useWorldSpace = false;
+        m_lineRenderer.useWorldSpace = false;
 
-        lineRenderer.material = beamMaterial;
-        lineRenderer.startColor = beamColor;
-        lineRenderer.endColor = beamColor;
+        m_lineRenderer.material = beamMaterial;
+        m_lineRenderer.startColor = beamColor;
+        m_lineRenderer.endColor = beamColor;
 
-        this.beamMaterial = beamMaterial;
-        this.beamColor = beamColor;
+        this.BeamMaterial = beamMaterial;
+        this.BeamColor = beamColor;
     }
 
 }

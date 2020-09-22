@@ -4,22 +4,30 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    #region //inspector
 
-    [SerializeField] private float bulletSpeed = 5f;
-    [SerializeField] private int damage = 5;
+    [SerializeField] private float BulletSpeed = 5f;
+    [SerializeField] private int Damage = 5;
+    [SerializeField] private float Lifetime = 3;
+    #endregion
 
-    [SerializeField] private float lifetime = 3;
+    #region //exposed
+    public float BulletSpeedProp { get => BulletSpeed; private set => BulletSpeed = value; }
+    public Rigidbody2D RigidBody { get => m_rigidBody; private set => m_rigidBody = value; }
+    #endregion
 
-    public float BulletSpeed { get => bulletSpeed; private set => bulletSpeed = value; }
-    public Rigidbody2D rigidBody { get; private set; }
 
-    private PooledObject pooled = null;
+    #region //Awake
+    private PooledObject m_pooled = null;
+    private Rigidbody2D m_rigidBody;
+    #endregion
+
 
     private void Awake()
     {
-        pooled = GetComponent<PooledObject>();
-        rigidBody = GetComponent<Rigidbody2D>();
-        rigidBody.velocity = new Vector2(0, BulletSpeed);
+        m_pooled = GetComponent<PooledObject>();
+        RigidBody = GetComponent<Rigidbody2D>();
+        RigidBody.velocity = new Vector2(0, BulletSpeedProp);
     }
 
     private void OnEnable()
@@ -29,17 +37,17 @@ public class Bullet : MonoBehaviour
 
     private IEnumerator lifeTimer()
     {
-        yield return new WaitForSeconds(lifetime);
-        pooled.returnToPool();
+        yield return new WaitForSeconds(Lifetime);
+        m_pooled.ReturnToPool();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        other.GetComponent<Enemy>().Damage(damage);
-        pooled.returnToPool();
+        other.GetComponent<Enemy>().Damage(Damage);
+        m_pooled.ReturnToPool();
     }
 
- 
+
 
 
 

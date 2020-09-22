@@ -119,10 +119,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9155e71aea90f004a9f11fa192200fa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 5
-  missileThrustForce: 2
-  lingerLifetime: 1
-  chaseDelay: 0.2
+  Damage: 5
+  MissileThrustForce: 1
+  LingerLifetime: 1
+  ChaseDelay: 0.4
 --- !u!61 &6464522911989140756
 BoxCollider2D:
   m_ObjectHideFlags: 0

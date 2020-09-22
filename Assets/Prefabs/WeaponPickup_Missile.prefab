@@ -25,11 +25,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lifetime: 10
   MissilePrefab: {fileID: 5345165811519086267, guid: 25b8f443d91f99e41bc1ddaefce29035, type: 3}
-  lockOnIcon: {fileID: 7618988584640063321, guid: f1495c6dcbc8fbd438a4b6730a652acb, type: 3}
-  lockOnDistance: 15
-  launchImpulse: 0.1
-  beamMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
-  beamColor: {r: 1, g: 0, b: 0.029678345, a: 1}
+  LockOnIcon: {fileID: 7618988584640063321, guid: f1495c6dcbc8fbd438a4b6730a652acb, type: 3}
+  LockOnDistance: 15
+  LaunchImpulse: 0.5
+  BeamMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  BeamColor: {r: 1, g: 0, b: 0.7404194, a: 1}
 --- !u!1001 &1838099839507532020
 PrefabInstance:
   m_ObjectHideFlags: 0

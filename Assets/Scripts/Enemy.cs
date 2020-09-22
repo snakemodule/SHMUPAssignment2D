@@ -6,36 +6,40 @@ using UnityEngine;
 [RequireComponent(typeof(PooledObject))]
 public class Enemy : MonoBehaviour
 {
-    [HideInInspector] public PathNodes movementPath = null;
+    #region //exposed
+    [HideInInspector] public PathNodes MovementPath = null;
+    #endregion
 
-    [SerializeField] private bool invertXMovement = false;
-    [SerializeField] private bool invertYMovement = false;
-
+    #region //inspector
+    [SerializeField] private bool InvertXMovement = false;
+    [SerializeField] private bool InvertYMovement = false;
     [SerializeField] private int HP = 5;
+    #endregion
 
-    private int xInvert = 1;
-    private int yInvert = 1;
+    #region //Awake
+    private PooledObject m_pooled = null;
+    private SpriteRenderer m_sprite = null;
+    #endregion
 
-    private PooledObject pooled = null;
-
-    private SpriteRenderer sprite = null;
-    public float SpawnTime { get; private set; }
-    public Action<Enemy> DeactivateCallback { private get; set; }
-
-    private Coroutine damageAnimation;
+    #region //internal
+    private int m_xInvert = 1;
+    private int m_yInvert = 1;
+    private Coroutine m_damageAnimation;
+    private float m_spawnTime = 0;
+    #endregion
 
     private void Awake()
     {
-        pooled = GetComponent<PooledObject>();
-        sprite = GetComponent<SpriteRenderer>();
+        m_pooled = GetComponent<PooledObject>();
+        m_sprite = GetComponent<SpriteRenderer>();
     }   
 
     private void OnEnable()
     {
-        xInvert = (invertXMovement) ? -1 : 1;
-        yInvert = (invertYMovement) ? -1 : 1;
+        m_xInvert = (InvertXMovement) ? -1 : 1;
+        m_yInvert = (InvertYMovement) ? -1 : 1;
 
-        SpawnTime = Time.time;
+        m_spawnTime = Time.time;
         transform.position = new Vector3(0, -20, 10);//offscreen//new Vector2(movementPath.curveX.Evaluate(0)*xInvert, movementPath.curveY.Evaluate(0)*yInvert);
     }
     
@@ -43,13 +47,13 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        float animationTime = Time.time - SpawnTime;
+        float animationTime = Time.time - m_spawnTime;
         transform.position = new Vector2(
-                movementPath.curveX.Evaluate(animationTime)*xInvert,
-                movementPath.curveY.Evaluate(animationTime)*yInvert);
-        if (animationTime > movementPath.duration)
+                MovementPath.curveX.Evaluate(animationTime)*m_xInvert,
+                MovementPath.curveY.Evaluate(animationTime)*m_yInvert);
+        if (animationTime > MovementPath.duration)
         {
-            pooled.returnToPool();
+            m_pooled.ReturnToPool();
         }
     }
 
@@ -61,25 +65,25 @@ public class Enemy : MonoBehaviour
             Die();
         else
         {
-            if (damageAnimation != null)
+            if (m_damageAnimation != null)
             {
-                StopCoroutine(damageAnimation);
+                StopCoroutine(m_damageAnimation);
             }
-            damageAnimation = StartCoroutine(animateDamageColor(sprite));
+            m_damageAnimation = StartCoroutine(AnimateDamageColor(m_sprite));
         }
     }
 
     private void Die()
     {
-        if (damageAnimation != null)
+        if (m_damageAnimation != null)
         {
-            StopCoroutine(damageAnimation);
+            StopCoroutine(m_damageAnimation);
         }
-        sprite.color = Color.white;
-        pooled.returnToPool();
+        m_sprite.color = Color.white;
+        m_pooled.ReturnToPool();
     }
 
-    private IEnumerator animateDamageColor(SpriteRenderer sprite)
+    private IEnumerator AnimateDamageColor(SpriteRenderer sprite)
     {
         float duration = 0.3f;
         float startTime = Time.time;

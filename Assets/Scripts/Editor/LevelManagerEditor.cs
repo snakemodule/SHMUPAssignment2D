@@ -21,7 +21,7 @@ public class LevelManagerEditor : Editor
                         return 0;
                     return (x.eventTime < y.eventTime) ? -1 : 1;
                 };
-            lm.timeline.Sort(cmp);
+            lm.Timeline.Sort(cmp);
         }
     }
 

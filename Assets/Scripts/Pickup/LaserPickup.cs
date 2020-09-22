@@ -2,18 +2,21 @@
 
 public class LaserPickup : WeaponPickup
 {
-    [SerializeField] private int damage = 3;
-    [SerializeField] private float fireRate = 12f;
-    [SerializeField] private float beamLength = 12f;
-    [SerializeField] private float maxBeamWidth = 0.35f;
-    [SerializeField] private float minBeamWidth = 0.2f;
-    [SerializeField] private Material beamMaterial = null;
-    [SerializeField] private Color beamColor = Color.white;
+    #region //inspector
+    [SerializeField] private int Damage = 3;
+    [SerializeField] private float FireRate = 12f;
+    [SerializeField] private float BeamLength = 12f;
+    [SerializeField] private float MaxBeamWidth = 0.35f;
+    [SerializeField] private float MinBeamWidth = 0.2f;
+    [SerializeField] private Material BeamMaterial = null;
+    [SerializeField] private Color BeamColor = Color.white;
+    #endregion
+
 
     public override void PickUpWeapon(PlayerController playerController)
     {
         playerController.AddWeapon<LaserWeapon>()
-            .Init(damage, fireRate, beamLength, maxBeamWidth, minBeamWidth, beamMaterial, beamColor);
+            .Init(Damage, FireRate, BeamLength, MaxBeamWidth, MinBeamWidth, BeamMaterial, BeamColor);
         if (lifetimer != null)
         {
             StopCoroutine(lifetimer);

@@ -5,80 +5,83 @@ using UnityEngine;
 
 public class Ship : MonoBehaviour
 {
-    private SpriteRenderer sprite;
+    #region //Awake
+    private SpriteRenderer m_sprite;
+    private PlayerController m_playerController;
+    #endregion
 
-    private PlayerController playerController;
+    #region //inspector
+    [SerializeField] private int HullHP = 3;
+    [SerializeField] private float IframeDuration = 1f;
+    [SerializeField] private float IframeFlashFrequency = 5f;
+    [SerializeField] private GameObject Shield = null;
+    [SerializeField] private float ShieldDuration = 2f;
+    [SerializeField] private float ShieldCooldown = 5f;
+    #endregion
 
-    [SerializeField] private int hullHP = 3;
-    [SerializeField] private float iframeDuration = 1f;
-    [SerializeField] private float iframeFlashFrequency = 5f;
-
-    private bool inIframe = false;
-    private bool shieldIsActive;
-    private bool shieldOnCooldown;
-
-    [SerializeField] private GameObject shield = null;
-    [SerializeField] private float shieldDuration = 2f;
-    [SerializeField] private float shieldCooldown = 5f;
+    #region //internal
+    private bool m_inIframe = false;
+    private bool m_shieldIsActive;
+    private bool m_shieldOnCooldown;
+    #endregion
 
     private void Awake()
     {
-        playerController = GetComponentInParent<PlayerController>();
-        sprite = GetComponent<SpriteRenderer>();
+        m_playerController = GetComponentInParent<PlayerController>();
+        m_sprite = GetComponent<SpriteRenderer>();
 
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.layer == 9 && !inIframe && !shieldIsActive)
+        if (collision.gameObject.layer == 9 && !m_inIframe && !m_shieldIsActive)
         {
-            inIframe = true;
-            hullHP--;
-            if (hullHP <= 0)
+            m_inIframe = true;
+            HullHP--;
+            if (HullHP <= 0)
             {
                 //die
                 gameObject.SetActive(false);
-                playerController.enabled = false;
+                m_playerController.enabled = false;
             }
             else
             {
-                StartCoroutine(animateDamageColor(sprite));
-                StartCoroutine(activateIframes(sprite));
+                StartCoroutine(AnimateDamageColor(m_sprite));
+                StartCoroutine(ActivateIframes(m_sprite));
             }
         }
         else if (collision.gameObject.layer == 10)
         {
-            collision.GetComponent<WeaponPickup>().PickUpWeapon(playerController);
+            collision.GetComponent<WeaponPickup>().PickUpWeapon(m_playerController);
         }
     }
 
     public void ActivateShield()
     {
-        if (!shieldIsActive && !shieldOnCooldown)
+        if (!m_shieldIsActive && !m_shieldOnCooldown)
         {
             StartCoroutine(ShieldUse());
-            StartCoroutine(ShieldCooldown());
+            StartCoroutine(ShieldCooldownCount());
         }
     }
 
     private IEnumerator ShieldUse()
     {
-        shieldIsActive = true;
-        shield.SetActive(shieldIsActive);
-        yield return new WaitForSeconds(shieldDuration);
-        shieldIsActive = false;
-        shield.SetActive(shieldIsActive);
+        m_shieldIsActive = true;
+        Shield.SetActive(m_shieldIsActive);
+        yield return new WaitForSeconds(ShieldDuration);
+        m_shieldIsActive = false;
+        Shield.SetActive(m_shieldIsActive);
     }
 
-    private IEnumerator ShieldCooldown()
+    private IEnumerator ShieldCooldownCount()
     {
-        shieldOnCooldown = true;
-        yield return new WaitForSeconds(shieldCooldown);
-        shieldOnCooldown = false;
+        m_shieldOnCooldown = true;
+        yield return new WaitForSeconds(ShieldCooldown);
+        m_shieldOnCooldown = false;
     }
 
-
-    private IEnumerator animateDamageColor(SpriteRenderer sprite)
+    private IEnumerator AnimateDamageColor(SpriteRenderer sprite)
     {
         float duration = 0.3f;
         float startTime = Time.time;
@@ -89,23 +92,21 @@ public class Ship : MonoBehaviour
         }
         sprite.color = Color.white;
     }
-
     
-
-    private IEnumerator activateIframes(SpriteRenderer sprite)
+    private IEnumerator ActivateIframes(SpriteRenderer sprite)
     {
         float startTime = Time.time;
-        while (Time.time - startTime < iframeDuration)
+        while (Time.time - startTime < IframeDuration)
         {
-            var rad = Mathf.Lerp(0, iframeFlashFrequency * iframeDuration * 2 * Mathf.PI,
-                Mathf.InverseLerp(startTime, startTime + iframeDuration, Time.time));
+            var rad = Mathf.Lerp(0, IframeFlashFrequency * IframeDuration * 2 * Mathf.PI,
+                Mathf.InverseLerp(startTime, startTime + IframeDuration, Time.time));
             if (Mathf.Sin(rad) >= 0)
                 sprite.enabled = true;
             else
                 sprite.enabled = false;
             yield return null;
         }
-        inIframe = false;
+        m_inIframe = false;
         sprite.enabled = true;
     }
 }

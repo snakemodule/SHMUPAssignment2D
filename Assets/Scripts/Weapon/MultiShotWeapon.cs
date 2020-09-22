@@ -4,30 +4,29 @@ using UnityEngine;
 
 public class MultiShotWeapon : BulletWeapon
 {
-
-    //public int BulletsFired = 3;
-
-    [Range(1, 128)] public int bulletsFired = 3;
-    [Range(0f, 90f)] public float spreadAngleDeg = 45f;
+    #region //inspector
+    [Range(1, 128)] public int BulletsFired = 3;
+    [Range(0f, 90f)] public float SpreadAngleDeg = 45f;
+    #endregion
 
     private void Awake()
     {
-        bulletPool = new SimplePool(20, Bullet);
-        shootCallback = Shoot;
+        m_bulletPool = new SimplePool(20, BulletPrefab);
+        m_shootCallback = Shoot;
     }
 
     public override string Name => "Multi Shot";
 
     protected override void Shoot()
     {
-        float angSpread = spreadAngleDeg * Mathf.Deg2Rad;
+        float angSpread = SpreadAngleDeg * Mathf.Deg2Rad;
 
         // angle between each bullet
-        float angBetweenBullets = bulletsFired == 1 ? 0 : angSpread / (bulletsFired - 1f);
+        float angBetweenBullets = BulletsFired == 1 ? 0 : angSpread / (BulletsFired - 1f);
 
         // offset to center bullets
-        float angOffset = bulletsFired == 1 ? 0 : angSpread / 2f;
-        for (int i = 0; i < bulletsFired; i++)
+        float angOffset = BulletsFired == 1 ? 0 : angSpread / 2f;
+        for (int i = 0; i < BulletsFired; i++)
         {
             // angle for this bullet
             float angle = angBetweenBullets * i - angOffset;
@@ -35,11 +34,11 @@ public class MultiShotWeapon : BulletWeapon
             // angle to direction
             Vector2 pos = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
 
-            var shot = bulletPool.getFromPool();
+            var shot = m_bulletPool.GetFromPool();
             //shot.gameObject.SetActive(true);
-            shot.transform.position = transform.position + (Vector3)bulletSpawnOffsetPosition;
+            shot.transform.position = transform.position + (Vector3)BulletSpawnOffsetPosition;
             var bulletScript = shot.GetComponent<Bullet>();
-            bulletScript.rigidBody.velocity = pos.yx() * bulletScript.BulletSpeed;
+            bulletScript.RigidBody.velocity = pos.yx() * bulletScript.BulletSpeedProp;
         }
 
     }

@@ -1,31 +1,30 @@
-﻿using System;
-using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BulletWeapon : ContinuousFireWeapon
 {
-    public PooledObject Bullet;
-    
-    public Vector2 bulletSpawnOffsetPosition = new Vector2(0f, 0.5f);
-        
-    protected SimplePool bulletPool;
+    #region //inspector
+    [SerializeField] protected PooledObject BulletPrefab;
+    [SerializeField] protected Vector2 BulletSpawnOffsetPosition = new Vector2(0f, 0.5f);
+    #endregion
+
+    #region //internal
+    protected SimplePool m_bulletPool;
+    #endregion
 
     public override string Name => "Standard";
 
     private void Awake()
     {
-        bulletPool = new SimplePool(10, Bullet);
-        shootCallback = Shoot;
+        m_bulletPool = new SimplePool(10, BulletPrefab);
+        m_shootCallback = Shoot;
     }
-
-    
 
     protected override void Shoot()
     {
-        var shot = bulletPool.getFromPool();        
-        shot.transform.position = transform.position + (Vector3)bulletSpawnOffsetPosition;
+        var shot = m_bulletPool.GetFromPool();        
+        shot.transform.position = transform.position + (Vector3)BulletSpawnOffsetPosition;
         var bulletScript = shot.GetComponent<Bullet>();
-        bulletScript.rigidBody.velocity = new Vector2(0f, bulletScript.BulletSpeed);
+        bulletScript.RigidBody.velocity = new Vector2(0f, bulletScript.BulletSpeedProp);
     }
 }
 

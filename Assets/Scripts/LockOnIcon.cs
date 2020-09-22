@@ -4,17 +4,20 @@ using UnityEngine;
 
 public class LockOnIcon : MonoBehaviour
 {
-    public Transform followTarget = null;
+    #region //exposed
+    [HideInInspector] public Transform FollowTarget = null;
+    [HideInInspector] public bool MissileLaunched = false;
+    [HideInInspector] public HomingMissile Missile = null;
+    #endregion
 
-    public HomingMissile missile = null;
+    #region //Awake
+    private PooledObject m_pooled = null;
+    #endregion
 
-    private PooledObject pooled = null;
-
-    public bool missileLaunched = false;
 
     private void Awake()
     {
-        pooled = GetComponent<PooledObject>();
+        m_pooled = GetComponent<PooledObject>();
     }
 
     private void OnEnable()
@@ -24,15 +27,14 @@ public class LockOnIcon : MonoBehaviour
 
     void Update()
     {
-        if ((missileLaunched && !missile.gameObject.activeSelf) || !followTarget.gameObject.activeSelf)
+        if ((MissileLaunched && !Missile.gameObject.activeSelf) || !FollowTarget.gameObject.activeSelf)
         {
-            missileLaunched = false;
-            pooled.returnToPool();
+            MissileLaunched = false;
+            m_pooled.ReturnToPool();
         }
         else 
         {
-            transform.position = followTarget.position;
-        } 
-        
+            transform.position = FollowTarget.position;
+        }         
     }
 }

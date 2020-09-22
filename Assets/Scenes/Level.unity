@@ -5462,12 +5462,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1659b918c4c664645b6531ce3935f529, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hullHP: 3
-  iframeDuration: 1
-  iframeFlashFrequency: 5
-  shield: {fileID: 613252729}
-  shieldDuration: 1
-  shieldCooldown: 5
+  HullHP: 3
+  IframeDuration: 1
+  IframeFlashFrequency: 5
+  Shield: {fileID: 0}
+  ShieldDuration: 2
+  ShieldCooldown: 5
 --- !u!1 &832162413
 GameObject:
   m_ObjectHideFlags: 0
@@ -5661,9 +5661,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3ef2a381d0975849973e700a7867d23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_followTarget: {fileID: 224335855}
-  m_followSpeed: 10
-  ship: {fileID: 695235451}
+  FollowTarget: {fileID: 224335855}
+  FollowSpeed: 5
+  PlayerShip: {fileID: 695235451}
 --- !u!4 &1281233371
 Transform:
   m_ObjectHideFlags: 0
@@ -5704,10 +5704,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShotsPerSecond: 5
-  Bullet: {fileID: 4346643334825272086, guid: 7786c2f1113f0a242b2c54c5a9c0d46b, type: 3}
-  bulletSpawnOffsetPosition: {x: 0, y: 0.5}
-  bulletsFired: 3
-  spreadAngleDeg: 45
+  BulletPrefab: {fileID: 4346643334825272086, guid: 7786c2f1113f0a242b2c54c5a9c0d46b, type: 3}
+  BulletSpawnOffsetPosition: {x: 0, y: 0.5}
+  BulletsFired: 3
+  SpreadAngleDeg: 45
 --- !u!1 &1619653633
 GameObject:
   m_ObjectHideFlags: 0
@@ -5751,42 +5751,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3452b7ff1363324a84a257fe6e3703d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeline:
+  Timeline:
   - Event: {fileID: 11400000, guid: 38ad5e3ea7d58224cac48d210f060eab, type: 2}
-    eventTime: 2
-    repeatAdditionalTimes: 29
+    eventTime: 0
+    repeatAdditionalTimes: 30
     repeatDelay: 4
   - Event: {fileID: 11400000, guid: f789239a96f3d474a92d9f77cf1f5a40, type: 2}
-    eventTime: 3
-    repeatAdditionalTimes: 29
+    eventTime: 2
+    repeatAdditionalTimes: 30
     repeatDelay: 4
   - Event: {fileID: 11400000, guid: 979fb822c9c2f944c9064093e3c51ff0, type: 2}
-    eventTime: 12
+    eventTime: 8
     repeatAdditionalTimes: 0
     repeatDelay: 0
   - Event: {fileID: 11400000, guid: 38eabab5bf839e44c8d4db900a09c862, type: 2}
-    eventTime: 15
-    repeatAdditionalTimes: 15
-    repeatDelay: 0.2
+    eventTime: 10
+    repeatAdditionalTimes: 20
+    repeatDelay: 0.15
   - Event: {fileID: 11400000, guid: 5bb5c99757e707744a9bc8d3d6f64342, type: 2}
-    eventTime: 18
+    eventTime: 14
     repeatAdditionalTimes: 0
     repeatDelay: 0
   - Event: {fileID: 11400000, guid: d00d5161807b2bd48ad3967fac36d153, type: 2}
-    eventTime: 20
+    eventTime: 16
     repeatAdditionalTimes: 30
-    repeatDelay: 0.2
-  - Event: {fileID: 11400000, guid: 6286243046cee2842bc5a4ca6a908303, type: 2}
-    eventTime: 30
-    repeatAdditionalTimes: 10
-    repeatDelay: 0.25
+    repeatDelay: 0.15
   - Event: {fileID: 11400000, guid: 7c191502e902fbd4aa8610a2117f11c4, type: 2}
-    eventTime: 36
-    repeatAdditionalTimes: 10
+    eventTime: 25
+    repeatAdditionalTimes: 15
     repeatDelay: 0.15
   - Event: {fileID: 11400000, guid: ed74e41e9b0e3cc4782f1a44dd179973, type: 2}
-    eventTime: 42
-    repeatAdditionalTimes: 10
+    eventTime: 32
+    repeatAdditionalTimes: 15
     repeatDelay: 0.15
 --- !u!1 &1876049211
 GameObject:

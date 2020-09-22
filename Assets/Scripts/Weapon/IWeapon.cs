@@ -6,7 +6,6 @@ public interface IWeapon
         get;
     }
 
-
     void PullTrigger();
     void ReleaseTrigger();
 }

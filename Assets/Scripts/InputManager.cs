@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class InputManager : MonoBehaviorSingleton<InputManager>
 {
+    #region //Awake
     private Controls m_controls;
-    
+    #endregion
+
     public void MousePositionRegister(Action<InputAction.CallbackContext> callback)
     {
         m_controls.Ship.MousePosition.performed += callback;
@@ -17,14 +17,14 @@ public class InputManager : MonoBehaviorSingleton<InputManager>
         m_controls.Ship.MousePosition.performed -= callback;
     }
 
-    public void LMBRegister(Action<InputAction.CallbackContext> press, 
+    public void LMBRegister(Action<InputAction.CallbackContext> press,
         Action<InputAction.CallbackContext> release)
     {
         m_controls.Ship.LMB.performed += press;
         m_controls.Ship.LMB.canceled += release;
     }
 
-    public void LMBUnregister(Action<InputAction.CallbackContext> press, 
+    public void LMBUnregister(Action<InputAction.CallbackContext> press,
         Action<InputAction.CallbackContext> release)
     {
         m_controls.Ship.LMB.performed -= press;
@@ -40,7 +40,6 @@ public class InputManager : MonoBehaviorSingleton<InputManager>
     {
         m_controls.Ship.RMB.performed -= press;
     }
-       
 
     private void Awake()
     {
@@ -50,5 +49,5 @@ public class InputManager : MonoBehaviorSingleton<InputManager>
         m_controls.Ship.RMB.Enable();
         m_controls.Ship.MousePosition.Enable();
     }
-    
+
 }

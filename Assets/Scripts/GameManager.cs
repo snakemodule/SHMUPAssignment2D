@@ -11,5 +11,4 @@ public class GameManager : MonoBehaviorSingleton<GameManager>
         UnityEngine.Cursor.lockState = CursorLockMode.Confined;
         MainCamera = Camera.main;
     }
-
 }

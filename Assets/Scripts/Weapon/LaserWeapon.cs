@@ -2,54 +2,57 @@
 using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer))]
-
 public class LaserWeapon : ContinuousFireWeapon
 {
+    #region //inspector
     [SerializeField] private int DamagePerPulse = 3;
     [SerializeField] private float BeamLength = 12f;
-    [SerializeField] private float maxBeamWidth = 0.35f;
-    [SerializeField] private float minBeamWidth = 0.2f;
-    [SerializeField] private Material beamMaterial = null;
-    [SerializeField] private Color beamColor = Color.white;
+    [SerializeField] private float MaxBeamWidth = 0.35f;
+    [SerializeField] private float MinBeamWidth = 0.2f;
+    [SerializeField] private Material BeamMaterial = null;
+    [SerializeField] private Color BeamColor = Color.white;
+    #endregion
 
+    #region //Awake
+    private LineRenderer m_lineRenderer;
+    #endregion
 
-    private LineRenderer lineRenderer;
-    private IEnumerator beamAnimation;
+    #region //internal
+    private IEnumerator m_beamAnimation;
+    #endregion
 
     public override string Name => "Pulse Laser";
 
     private void Awake()
     {
-        shootCallback = Shoot;
-        lineRenderer = gameObject.GetComponent<LineRenderer>();
-        lineRenderer.widthMultiplier = 0f;
+        m_shootCallback = Shoot;
+        m_lineRenderer = gameObject.GetComponent<LineRenderer>();
+        m_lineRenderer.widthMultiplier = 0f;
     }
 
     private void OnEnable()
     {
-        lineRenderer.SetPositions(new Vector3[]
+        m_lineRenderer.SetPositions(new Vector3[]
             { Vector3.zero, new Vector3(0f, BeamLength, 0f) });
-        lineRenderer.widthMultiplier = 0f;
+        m_lineRenderer.widthMultiplier = 0f;
 
-        lineRenderer.material = beamMaterial;
-        lineRenderer.startColor = beamColor;
-        lineRenderer.endColor = beamColor;
+        m_lineRenderer.material = BeamMaterial;
+        m_lineRenderer.startColor = BeamColor;
+        m_lineRenderer.endColor = BeamColor;
     }
 
     private void OnDisable()
     {
-        lineRenderer.widthMultiplier = 0f;
+        m_lineRenderer.widthMultiplier = 0f;
     }
-
 
     protected override void Shoot()
     {
         float delay = 1 / ShotsPerSecond;
-        if(beamAnimation != null)
-            StopCoroutine(beamAnimation);
-        beamAnimation = AnimateBeam(delay);
-        StartCoroutine(beamAnimation);
-
+        if(m_beamAnimation != null)
+            StopCoroutine(m_beamAnimation);
+        m_beamAnimation = AnimateBeam(delay);
+        StartCoroutine(m_beamAnimation);
 
         int enemiesLayerMask = 1 << LayerMask.NameToLayer("Enemies");
         RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, Vector2.up, BeamLength, enemiesLayerMask);
@@ -65,11 +68,11 @@ public class LaserWeapon : ContinuousFireWeapon
         float endTime = startTime + duration;
         while (Time.time <= endTime)
         {
-            lineRenderer.widthMultiplier = Mathf.Lerp(minBeamWidth, maxBeamWidth, 
+            m_lineRenderer.widthMultiplier = Mathf.Lerp(MinBeamWidth, MaxBeamWidth, 
                 Mathf.InverseLerp(endTime, startTime, Time.time));
             yield return null;
         }
-        lineRenderer.widthMultiplier = 0f;
+        m_lineRenderer.widthMultiplier = 0f;
     }
 
     public void Init(int damage, float fireRate, float beamLength, 
@@ -78,18 +81,18 @@ public class LaserWeapon : ContinuousFireWeapon
         ShotsPerSecond = fireRate;
         DamagePerPulse = damage;
         BeamLength = beamLength;
-        maxBeamWidth = maxWidth;
-        minBeamWidth = minWidth;
+        MaxBeamWidth = maxWidth;
+        MinBeamWidth = minWidth;
 
-        lineRenderer.SetPositions(new Vector3[]
+        m_lineRenderer.SetPositions(new Vector3[]
             { Vector3.zero, new Vector3(0f, BeamLength, 0f) });
-        lineRenderer.useWorldSpace = false;
-        lineRenderer.material = beamMaterial;
-        lineRenderer.startColor = beamColor;
-        lineRenderer.endColor = beamColor;
+        m_lineRenderer.useWorldSpace = false;
+        m_lineRenderer.material = beamMaterial;
+        m_lineRenderer.startColor = beamColor;
+        m_lineRenderer.endColor = beamColor;
 
-        this.beamMaterial = beamMaterial;
-        this.beamColor = beamColor;
+        this.BeamMaterial = beamMaterial;
+        this.BeamColor = beamColor;
     }
 
 
