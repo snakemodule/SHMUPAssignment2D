@@ -1,0 +1,52 @@
+{
+    "name": "Controls",
+    "maps": [
+        {
+            "name": "Ship",
+            "id": "94ce884b-8b98-4b10-97f1-db232c8e319e",
+            "actions": [
+                {
+                    "name": "Fire",
+                    "type": "Button",
+                    "id": "97dd3950-5fa6-4b76-bdc4-6cfdad13a044",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "MousePosition",
+                    "type": "Value",
+                    "id": "9802cebf-3215-41ae-a8bf-b38f5c9a3cc5",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "571c732c-c225-4e74-afbf-b8c29a17b8de",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Fire",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eef1f7d3-e1d4-40b4-8ec9-2ed07aeecddf",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MousePosition",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
