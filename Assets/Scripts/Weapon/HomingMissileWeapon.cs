@@ -19,7 +19,12 @@ public class HomingMissileWeapon : MonoBehaviour, IWeapon
     }
     private EWeaponState weaponState = EWeaponState.neutral;
 
-    private Dictionary<Transform, PooledObject> lockOns = new Dictionary<Transform, PooledObject>();
+    
+    private HashSet<Transform> lockOns =
+        new HashSet<Transform>();
+    private Dictionary<Transform, LockOnIcon> lockOnIcons = 
+        new Dictionary<Transform, LockOnIcon>();
+
     private LineRenderer lineRenderer = null;
 
     private Coroutine lockingCoroutine;
@@ -87,11 +92,12 @@ public class HomingMissileWeapon : MonoBehaviour, IWeapon
             hits = Physics2D.RaycastAll(transform.position, Vector2.up, lockOnDistance, layer);
             foreach (var item in hits)
             {
-                if (!lockOns.ContainsKey(item.transform))
+                if (!lockOns.Contains(item.transform))
                 {
-                    var icon = lockOnIconPool.getFromPool();
-                    icon.GetComponent<LockOnIcon>().followTarget = item.transform;
-                    lockOns.Add(item.transform, icon);
+                    lockOns.Add(item.transform);
+                    var icon = lockOnIconPool.getFromPool().GetComponent<LockOnIcon>();
+                    icon.followTarget = item.transform;
+                    lockOnIcons.Add(item.transform, icon);
                 }
             }
             yield return null;
@@ -101,11 +107,12 @@ public class HomingMissileWeapon : MonoBehaviour, IWeapon
     private IEnumerator firing()
     {
         float fireDelay = 0.15f; //todo field
-        foreach (var keyValuePair in lockOns)
+        foreach (Transform target in lockOns)
         {            
             var homingMissile = missilePool.getFromPool().GetComponent<HomingMissile>();
-            homingMissile.TargetLock = keyValuePair.Key;
-            homingMissile.LockOnIcon = keyValuePair.Value;
+            homingMissile.TargetLock = target;
+            lockOnIcons[target].missileLaunched = true ;
+            lockOnIcons[target].missile = homingMissile;
 
             Vector2 randomSpawnDirection = Random.insideUnitCircle.normalized;
             randomSpawnDirection = new Vector2(randomSpawnDirection.x, Mathf.Abs(randomSpawnDirection.y));
@@ -114,12 +121,13 @@ public class HomingMissileWeapon : MonoBehaviour, IWeapon
             homingMissile.Body.AddForce(randomSpawnDirection*launchImpulse, ForceMode2D.Impulse);
 
             homingMissile.transform.rotation = Quaternion.LookRotation(
-                Vector3.back, keyValuePair.Key.position - homingMissile.transform.position);
-            StartCoroutine(homingMissile.ChaseTargetLock());
+                Vector3.back, target.position - homingMissile.transform.position);
+            homingMissile.StartChase();
             
             yield return new WaitForSeconds(fireDelay);
         }
         lockOns.Clear();
+        lockOnIcons.Clear();
         weaponState = EWeaponState.neutral;
     }
 

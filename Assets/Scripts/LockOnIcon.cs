@@ -6,11 +6,33 @@ public class LockOnIcon : MonoBehaviour
 {
     public Transform followTarget = null;
 
-    // Update is called once per frame
+    public HomingMissile missile = null;
+
+    private PooledObject pooled = null;
+
+    public bool missileLaunched = false;
+
+    private void Awake()
+    {
+        pooled = GetComponent<PooledObject>();
+    }
+
+    private void OnEnable()
+    {
+        transform.position = new Vector3(0, -20, 10); //offscreen
+    }
+
     void Update()
     {
-
-        transform.position = followTarget.position;
-
+        if ((missileLaunched && !missile.gameObject.activeSelf) || !followTarget.gameObject.activeSelf)
+        {
+            missileLaunched = false;
+            pooled.returnToPool();
+        }
+        else 
+        {
+            transform.position = followTarget.position;
+        } 
+        
     }
 }

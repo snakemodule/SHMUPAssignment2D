@@ -99,7 +99,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 1
   m_Mass: 1
-  m_LinearDrag: 3
+  m_LinearDrag: 10
   m_AngularDrag: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
@@ -120,8 +120,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 5
-  missileThrustForce: 0.5
-  lingerLifetime: 5
+  missileThrustForce: 100
+  lingerLifetime: 1
   chaseDelay: 0.2
 --- !u!61 &6464522911989140756
 BoxCollider2D:

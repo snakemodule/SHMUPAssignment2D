@@ -6,7 +6,7 @@ using UnityEngine;
 public class HomingMissile : MonoBehaviour
 {
     public Transform TargetLock { private get; set; }
-    public PooledObject LockOnIcon { private get; set; }
+    //public PooledObject LockOnIcon { private get; set; }
 
     private Rigidbody2D body = null;
     public Rigidbody2D Body { get => body; private set => body = value; }
@@ -17,6 +17,9 @@ public class HomingMissile : MonoBehaviour
     [SerializeField] private float chaseDelay = 0.5f;
 
     private PooledObject pooled = null;
+
+    public Coroutine chasing = null;
+
 
     private void Awake()
     {
@@ -34,10 +37,9 @@ public class HomingMissile : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(                
                 Vector3.back, TargetLock.position - transform.position);
 
-            body.AddForce(transform.up*missileThrustForce, ForceMode2D.Force);
+            body.AddForce(transform.up*missileThrustForce*Time.deltaTime, ForceMode2D.Force);
             yield return null;
         }
-        LockOnIcon.returnToPool();
         var saveDrag = body.drag;
         body.drag = 0f;
         yield return new WaitForSeconds(lingerLifetime);
@@ -50,10 +52,15 @@ public class HomingMissile : MonoBehaviour
         pooled.returnToPool();
     }
 
+    public void StartChase()
+    {
+        chasing = StartCoroutine(ChaseTargetLock());
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         collision.GetComponent<Enemy>().Damage(damage);
-        LockOnIcon.returnToPool();
+        StopCoroutine(chasing);
         DestroyMissile();
     }
 
