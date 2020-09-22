@@ -5466,7 +5466,7 @@ MonoBehaviour:
   IframeDuration: 1
   IframeFlashFrequency: 5
   Shield: {fileID: 0}
-  ShieldDuration: 2
+  ShieldDuration: 1
   ShieldCooldown: 5
 --- !u!1 &832162413
 GameObject:

@@ -59,5 +59,9 @@ PrefabInstance:
       propertyPath: invertYMovement
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4782400778721508138, guid: 4470789893ddd644eb1ce7e61e82ca3c, type: 3}
+      propertyPath: InvertYMovement
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4470789893ddd644eb1ce7e61e82ca3c, type: 3}
