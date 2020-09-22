@@ -20,13 +20,20 @@ public class HomingMissile : MonoBehaviour
 
     public Coroutine chasing = null;
 
+    private float defaultDrag = 1f;
 
     private void Awake()
-    {
+    {        
         body = GetComponent<Rigidbody2D>();
         pooled = GetComponent<PooledObject>();
+        defaultDrag = body.drag;
     }
-    
+
+
+    private void OnEnable()
+    {
+        body.drag = defaultDrag;
+    }
 
     public IEnumerator ChaseTargetLock()    
     {
@@ -37,7 +44,7 @@ public class HomingMissile : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(                
                 Vector3.back, TargetLock.position - transform.position);
 
-            body.AddForce(transform.up*missileThrustForce*Time.deltaTime, ForceMode2D.Force);
+            body.AddForce(transform.up*missileThrustForce, ForceMode2D.Force);
             yield return null;
         }
         var saveDrag = body.drag;
