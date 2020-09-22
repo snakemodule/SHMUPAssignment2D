@@ -6,8 +6,7 @@ LMB fire current weapon.
 	Homing Missiles, when held fires a laser that marks targets for tracking.
 		On release, rapidly fires missiles each locked on to one marked target. 
 		If the a target is destroyed or despawns, the missile loses tracking and goes inactive and despawns after a short time.
-		Known bug: under some circumstances (possibly related to weapon swapping or attempting to start locking on while still firing missiles from a previous lock on),-
-		-the icon signifying a marked target does not show up properly.
+		Known bug: under some circumstances (possibly related to weapon swapping or attempting to start locking on while still firing missiles from a previous lock on) the icon signifying a marked target does not show up properly.
 Scroll up/down to swap weapon, after picking up weapon powerup.
 RMB activates shield, 1 second invulnerability, 5 second cooldown.
 
