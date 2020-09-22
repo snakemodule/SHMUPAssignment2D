@@ -7,7 +7,6 @@ public class BulletWeapon : ContinousFireWeapon
     public PooledObject Bullet;
     
     public Vector2 bulletSpawnOffsetPosition = new Vector2(0f, 0.5f);
-    public float damage = 10;
         
     protected SimplePool bulletPool;
 
@@ -19,11 +18,10 @@ public class BulletWeapon : ContinousFireWeapon
 
     protected override void Shoot()
     {
-        var shot = bulletPool.getFromPool();
-        shot.gameObject.SetActive(true);
+        var shot = bulletPool.getFromPool();        
         shot.transform.position = transform.position + (Vector3)bulletSpawnOffsetPosition;
         var bulletScript = shot.GetComponent<Bullet>();
-        bulletScript.rb.velocity = new Vector2(0f, bulletScript.bulletSpeed);
+        bulletScript.rigidBody.velocity = new Vector2(0f, bulletScript.BulletSpeed);
     }
 }
 

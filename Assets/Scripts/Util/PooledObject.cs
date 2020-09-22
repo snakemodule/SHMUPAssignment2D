@@ -9,16 +9,7 @@ public class PooledObject : MonoBehaviour
     //return to the pool and become inactive
     public void returnToPool()
     {
+        //gameObject.SetActive(false);
         myPool.addToPool(this);
-        gameObject.SetActive(false);
-    }
-
-}
-
-public class Example : MonoBehaviour
-{
-    private Example getThisComponent()
-    {
-        return this;
     }
 }

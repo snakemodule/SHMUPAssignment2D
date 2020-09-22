@@ -34,10 +34,10 @@ public class MultiShot : BulletWeapon
             Vector2 pos = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
 
             var shot = bulletPool.getFromPool();
-            shot.gameObject.SetActive(true);
+            //shot.gameObject.SetActive(true);
             shot.transform.position = transform.position + (Vector3)bulletSpawnOffsetPosition;
             var bulletScript = shot.GetComponent<Bullet>();
-            bulletScript.rb.velocity = pos.yx() * bulletScript.bulletSpeed;
+            bulletScript.rigidBody.velocity = pos.yx() * bulletScript.BulletSpeed;
         }
 
     }

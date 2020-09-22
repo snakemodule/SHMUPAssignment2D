@@ -7,7 +7,7 @@ public class MainManager : MonoBehaviorSingleton<MainManager>
     private void Awake()
     {
         RegisterSingleton();
-        UnityEngine.Cursor.visible = false;
+        //UnityEngine.Cursor.visible = false;
         UnityEngine.Cursor.lockState = CursorLockMode.Confined;
         MainCamera = Camera.main;
     }

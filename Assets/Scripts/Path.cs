@@ -5,29 +5,21 @@ using UnityEngine;
 
 public class Path : MonoBehaviour
 {
-
-    //[SerializeField] private Vector3[] controlPoints = new Vector3[];
-
+    
     private Vector2Interpolation[] interpolators;
 
     private AnimationCurve ac;
 
     private Vector2 gizmosPosition;
 
-    [Serializable] private struct control_point {
-        public float x, y, t;
-    };
+    //[Serializable] public struct control_point {
+    //    public float x, y, t;
+    //};
 
-    [SerializeField] private List<control_point> controlPoints = new List<control_point>();
-    
-    private void OnDrawGizmosSelected()
-    {
-        foreach (var controlPoint in controlPoints)
-        {
-            Handles.PositionHandle(new Vector3(controlPoint.x, controlPoint.y, 0), Quaternion.identity);
-        }
-    }
+    //[SerializeField] public List<control_point> controlPoints = new List<control_point>();
 
+    [SerializeField] public List<Vector2> controlPoints = new List<Vector2>();
+        
 
     struct CubicPolynomial
     {

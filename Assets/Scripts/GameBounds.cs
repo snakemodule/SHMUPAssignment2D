@@ -7,9 +7,7 @@ using UnityEngine;
 /// </summary>
 public class GameBounds : MonoBehaviour
 {
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        collision.GetComponent<PooledObject>()?.returnToPool();
-    }
+    
+
     
 }

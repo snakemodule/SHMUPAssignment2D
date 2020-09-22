@@ -10,6 +10,8 @@ public class Cursor : MonoBehaviour
 
     private Transform thisTransform;
 
+    Vector2 mousePosition;
+
     private void Awake()
     {
         thisTransform = transform;
@@ -23,15 +25,25 @@ public class Cursor : MonoBehaviour
         m_inputManager.MousePositionRegister(updateCursorPosition);
     }
 
+    private void Update()
+    {        
+        if (Application.isFocused && mousePosition.x > 0 && mousePosition.x < Screen.width
+            && mousePosition.y > 0 && mousePosition.y < Screen.height)
+        {
+            thisTransform.position = m_mainCamera.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, 1f));
+        }
+    }
+
+
     private void updateCursorPosition(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        Vector2 position = context.ReadValue<Vector2>();
-        if (Application.isFocused && position.x > 0 && position.x < Screen.width
-            && position.y > 0 && position.y < Screen.height)
-        {
-            thisTransform.position = m_mainCamera.ScreenToWorldPoint(new Vector3(position.x, position.y, 1f));
-        }
-
+        mousePosition = context.ReadValue<Vector2>();
+        //if (Application.isFocused && position.x > 0 && position.x < Screen.width
+        //    && position.y > 0 && position.y < Screen.height)
+        //{
+        //    thisTransform.position = m_mainCamera.ScreenToWorldPoint(new Vector3(position.x, position.y, 1f));
+        //}
+        //
     }
 
 

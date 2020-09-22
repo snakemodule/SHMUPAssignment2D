@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(BulletWeapon))]
+//[RequireComponent(typeof(BulletWeapon))]
 public class PlayerController : MonoBehaviour
 {
     //set in inspector
@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        weapons.Add(GetComponent<BulletWeapon>());
+        weapons.Add(GetComponent<HomingMissileWeapon>());
     }
 
     private void Start()

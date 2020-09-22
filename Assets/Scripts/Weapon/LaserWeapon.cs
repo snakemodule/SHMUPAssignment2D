@@ -20,25 +20,24 @@ public class LaserWeapon : ContinousFireWeapon
     private void Awake()
     {
         shootCallback = Shoot;
-
         lineRenderer = gameObject.GetComponent<LineRenderer>();
-        if (lineRenderer == null)        
-            lineRenderer = gameObject.AddComponent<LineRenderer>();
-        lineRenderer.useWorldSpace = false;
-        lineRenderer.SetPositions(new Vector3[] 
-            { Vector3.zero, new Vector3(0f, BeamLength, 0f) });
-        lineRenderer.startWidth = 1f;
-        lineRenderer.endWidth = 1f;
         lineRenderer.widthMultiplier = 0f;
-        
         hitDetectLayerMask = 0;
-        HitsLayers.ForEach((layerNumber) => { hitDetectLayerMask = hitDetectLayerMask | (1 << layerNumber); });
+        HitsLayers.ForEach((layerNumber) => { hitDetectLayerMask = hitDetectLayerMask | (1 << layerNumber); }); //test this
     }
 
-    private void OnDestroy()
+    private void OnEnable()
     {
-        Destroy(lineRenderer);
+        lineRenderer.SetPositions(new Vector3[]
+            { Vector3.zero, new Vector3(0f, BeamLength, 0f) });
+        lineRenderer.widthMultiplier = 0f;        
     }
+
+    private void OnDisable()
+    {
+        lineRenderer.widthMultiplier = 0f;
+    }
+
 
     protected override void Shoot()
     {

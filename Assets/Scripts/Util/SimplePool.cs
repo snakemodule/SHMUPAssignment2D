@@ -1,11 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.Assertions;
 
 public class SimplePool
 {
     public PooledObject Prefab = null;
-    private Stack<PooledObject> objectPool = null;
+    //private Stack<PooledObject> objectPool = null;
+    private Queue<PooledObject> objectPool = null;
+
+    //private List<>
+
+    private Action<PooledObject> instanceInitializer = null;
 
     public SimplePool(int count, PooledObject prefab)
     {
@@ -13,30 +19,52 @@ public class SimplePool
         fillPool(count);
     }
 
+    public SimplePool(int count, PooledObject prefab, Action<PooledObject> initializer)
+    {
+        Prefab = prefab;
+        instanceInitializer = initializer;
+        fillPool(count);
+    }
+
     private void fillPool(int count)
     {
-        objectPool = new Stack<PooledObject>(count);
+        objectPool = new Queue<PooledObject>(count);
         for (int i = 0; i < count; i++)
         {
-            PooledObject instance = GameObject.Instantiate(Prefab);
-            instance.myPool = this;
-            objectPool.Push(instance);
+            objectPool.Enqueue(initPooled());
         }
     }
 
     public void addToPool(PooledObject obj)
     {
-        objectPool.Push(obj);
+        obj.gameObject.SetActive(false);
+        objectPool.Enqueue(obj);
     }
-    
+
+    private PooledObject initPooled()
+    {
+        PooledObject instance = null;
+        instance = GameObject.Instantiate(Prefab);
+        if (instanceInitializer != null)
+            instanceInitializer(instance);
+        instance.myPool = this;
+        return instance;
+    }
+
     public PooledObject getFromPool()
     {
+        PooledObject instance = null;
         if (objectPool.Count > 0)
         {
-           return objectPool.Pop();
+            instance = objectPool.Dequeue();
         }
-        PooledObject instance = GameObject.Instantiate(Prefab);
-        instance.myPool = this;
+        else
+        {
+            instance = initPooled();
+        }
+
+        instance.gameObject.SetActive(true);
+        //Assert.IsTrue(instance.gameObject.activeSelf);
         return instance;
     }
 }

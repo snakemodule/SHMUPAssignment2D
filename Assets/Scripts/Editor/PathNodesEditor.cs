@@ -1,15 +1,16 @@
-﻿using UnityEditor;
+﻿
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.Assertions;
 
-[CustomEditor(typeof(Path))]
-public class PathEditor : Editor
+[CustomEditor(typeof(PathNodes))]
+public class PathNodesEditor : Editor
 {
     private Tool _lastTool = Tool.None;
     private GUIStyle _style = new GUIStyle();
 
     private SerializedObject so;
     private SerializedProperty controlPointSerialProp;
+    private SerializedProperty durationProp;
 
     private void OnEnable()
     {
@@ -21,16 +22,20 @@ public class PathEditor : Editor
 
         so = serializedObject;
         controlPointSerialProp = so.FindProperty("controlPoints");
+        durationProp = so.FindProperty("duration");
+
+        SceneView.duringSceneGui += DuringSceneGUI; 
     }
 
     private void OnDisable()
     {
         Tools.current = _lastTool;
+
+        SceneView.duringSceneGui -= DuringSceneGUI;
     }
 
-
-    private void OnSceneGUI()
-    {        
+    private void DuringSceneGUI(SceneView sceneView)
+    {
         so.Update();
         int arrayLength = controlPointSerialProp.arraySize;
         SerializedProperty item;
@@ -38,23 +43,23 @@ public class PathEditor : Editor
         {
             item = controlPointSerialProp.GetArrayElementAtIndex(i);
             item.vector2Value = Handles.PositionHandle(item.vector2Value, Quaternion.identity);
-        }        
+        }
         so.ApplyModifiedProperties();
 
         if (Event.current.type == EventType.Repaint)
         {
             AnimationCurve curveX = new AnimationCurve();
             AnimationCurve curveY = new AnimationCurve();
+            float duration = durationProp.floatValue;
             float timeStep = 0;
             if (arrayLength > 1)
-                timeStep = 1f / (arrayLength - 1);
+                timeStep = duration / (arrayLength - 1);
             float t = 0;
             for (int i = 0; i < arrayLength; i++)
             {
                 item = controlPointSerialProp.GetArrayElementAtIndex(i);
                 curveX.AddKey(new Keyframe(t, item.vector2Value.x));
-                curveY.AddKey(new Keyframe(t, item.vector2Value.y));
-                Assert.IsTrue(t <= 1);
+                curveY.AddKey(new Keyframe(t, item.vector2Value.y));                
                 t += timeStep;
             }
 
@@ -64,25 +69,12 @@ public class PathEditor : Editor
                 curveY.SmoothTangents(i, 0f);
             }
 
-            for (float timeCount = 0; timeCount <= 1f; timeCount += 0.02f)
+            for (float timeCount = 0; timeCount <= duration; timeCount += 0.1f)
             {
-                //Gizmos.DrawSphere(new Vector3(curveX.Evaluate(timeCount), curveY.Evaluate(timeCount), 0), 0.2f);
-                Handles.SphereHandleCap(1, new Vector3(curveX.Evaluate(timeCount), 
+                
+                Handles.SphereHandleCap(1, new Vector3(curveX.Evaluate(timeCount),
                     curveY.Evaluate(timeCount), 0), Quaternion.identity, 0.2f, EventType.Repaint);
             }
-        }
-    }
-
-    public static void LogProperties(SerializedObject so, bool includeChildren = true)
-    {
-        // Shows all the properties in the serialized object with name and type
-        // You can use this to learn the structure
-        so.Update();
-        SerializedProperty propertyLogger = so.GetIterator();
-        while (true)
-        {
-            Debug.Log("name = " + propertyLogger.name + " type = " + propertyLogger.type);
-            if (!propertyLogger.Next(includeChildren)) break;
         }
     }
 
